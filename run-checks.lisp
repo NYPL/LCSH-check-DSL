@@ -1,6 +1,9 @@
 #!/usr/local/bin/lispscript
+; vi: ft=lisp
 
 
+« (DEFVAR *INPUT-FILE* Ø (CADR (CMDARGS)))
+    or die "no input file supplied" »
 
 (DEFVAR *CHECKS* NIL)
 
@@ -26,25 +29,26 @@
 (DEFMETHOD check-violation ((acheck REGEX-CHECK) aheader)
   (~m aheader { acheck 'comp-regex }))
 
-; make red a macro!!
 (DEFMETHOD show-error ((anerror BAD-HEADER))
-  (ft "~40S~A~%" (line anerror) (red •violates rule "~A"• (text anerror))))
+  (FT "~40S~A~%" (line anerror) (RED •violates rule "~A"• (text anerror))))
 
 
 
 (LOAD "rules.lisp")
 
 
-(for-each "./test-files/test1"
-  (let ((this-line        value!))
-    (for-each *CHECKS*
-      (handler-case
-        (progn
-          (when (check-violation value! this-line)
-            (error 'regex-rule-failure
-                   :text (fn "~A: m/~A/" { value! 'doc } { value! 'regex })
+(FOR-EACH *INPUT-FILE*
+  (LET ((this-line        value!))
+    (fOR-EACH *CHECKS*
+      (HANDLER-CASE
+        (PROGN
+          (WHEN (check-violation value! this-line)
+            (ERROR 'regex-rule-failure
+                   :text (FN "~A: m/~A/" { value! 'doc } { value! 'regex })
                    :line this-line)
-            (ft "passed!~%")))
+            (FT "passed!~%")))
         (bad-header (error!) (show-error error!))))))
 
 
+
+; vi: ft=lisp
