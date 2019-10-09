@@ -18,6 +18,8 @@ Here are examples
 
 Test it by running `./run-checks.lisp test/test1`
 
+Note: this is a prototype so it's written in very non-portable CL.
+If required, it'll be rewritten.
 
 (this is a stub for now)
 
