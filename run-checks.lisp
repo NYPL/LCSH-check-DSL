@@ -3,51 +3,52 @@
 
 
 « (DEFVAR *INPUT-FILE* Ø (CADR (CMDARGS)))
-    or die "no input file supplied" »
+    OR DIE "NO INPUT FILE SUPPLIED" »
 
 (DEFVAR *CHECKS* NIL)
 
 (DEFCLASS LCSH-CHECK ()
-  ((doc :initarg :doc)))
+  ((DOC :INITARG :DOC)))
 
-(DEFCLASS REGEX-CHECK (lcsh-check)
-  ((regex        :initarg :regex)
-   (comp-regex   :initarg :comp-regex)))
+(DEFCLASS REGEX-CHECK (LCSH-CHECK)
+  ((REGEX        :INITARG :REGEX)
+   (COMP-REGEX   :INITARG :COMP-REGEX)))
 
-(DEFMACRO DEFINE-REGEX-RULE (sym regex doc)
-  `(PROGN (push (make-instance 'regex-check
-                               :regex ,regex :comp-regex (re-compile ,regex)
-                               :doc ,doc) *CHECKS*)))
+(DEFMACRO DEFINE-REGEX-RULE (SYM REGEX DOC)
+  `(PROGN (PUSH (MAKE-INSTANCE 'REGEX-CHECK
+                               :REGEX ,REGEX :COMP-REGEX (RE-COMPILE ,REGEX)
+                               :DOC ,DOC) *CHECKS*)))
 
-(DEFINE-CONDITION bad-header (error)
-  ((text :initarg :text :reader text)))
+(DEFINE-CONDITION BAD-HEADER (ERROR)
+  ((TEXT :INITARG :TEXT :READER TEXT)))
 
-(DEFINE-CONDITION regex-rule-failure (bad-header)
-  ((text :initarg :text :reader text)
-   (line :initarg :line :reader line)))
+(DEFINE-CONDITION REGEX-RULE-FAILURE (BAD-HEADER)
+  ((TEXT :INITARG :TEXT :READER TEXT)
+   (LINE :INITARG :LINE :READER LINE)))
 
-(DEFMETHOD check-violation ((acheck REGEX-CHECK) aheader)
-  (~m aheader { acheck 'comp-regex }))
+(DEFMETHOD CHECK-VIOLATION ((ACHECK REGEX-CHECK) AHEADER)
+  (~M AHEADER { ACHECK 'COMP-REGEX }))
 
-(DEFMETHOD show-error ((anerror BAD-HEADER))
-  (FT "~40S~A~%" (line anerror) (RED •violates rule "~A"• (text anerror))))
+(DEFMETHOD SHOW-ERROR ((ANERROR BAD-HEADER))
+  (FT "~40S~A~%" (LINE ANERROR) (RED •violates rule "~A"• (TEXT ANERROR))))
 
 
 
 (LOAD "rules.lisp")
 
 
-(FOR-EACH *INPUT-FILE*
-  (LET ((this-line        value!))
-    (fOR-EACH *CHECKS*
+(FOR-EACH-LINE *INPUT-FILE*
+  (LET ((THIS-LINE        VALUE!))
+    (FOR-EACH-LIST *CHECKS*
+      (WHEN (> INDEX! 10) (BREAK!))
       (HANDLER-CASE
         (PROGN
-          (WHEN (check-violation value! this-line)
-            (ERROR 'regex-rule-failure
-                   :text (FN "~A: m/~A/" { value! 'doc } { value! 'regex })
-                   :line this-line)
+          (WHEN (CHECK-VIOLATION VALUE! THIS-LINE)
+            (ERROR 'REGEX-RULE-FAILURE
+                   :TEXT (FN "~A: M/~A/" { VALUE! 'DOC } { VALUE! 'REGEX })
+                   :LINE THIS-LINE)
             (FT "passed!~%")))
-        (bad-header (error!) (show-error error!))))))
+        (BAD-HEADER (ERROR!) (SHOW-ERROR ERROR!))))))
 
 
 

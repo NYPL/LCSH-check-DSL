@@ -1,0 +1,26 @@
+#!/usr/local/bin/lispscript
+
+
+
+(DEFCONSTANT +NUM-APPROVED+ 726036)
+(DEFPARAMETER *APPROVED* (MAKE-HASH-TABLE :SIZE 1000000 :TEST #'EQUAL))
+
+
+(FOR-EACH-LINE "./unprocessed-lcshs.txt"
+  ; (PROGRESS INDEX! +NUM-APPROVED+ :INTERVAL 10000)
+  (SETF (GETHASH VALUE! *APPROVED* ) T))
+
+
+(DEFCONSTANT +NUM-OUR-TABLE+ 313710)
+
+(FOR-EACH-LINE "counts.dat"
+  (LET* ((NOQUOTES    (~RA VALUE! •"• ""))
+         (THESPLIT     (~S NOQUOTES •\T•))
+         (THECOUNT     (CAR THESPLIT))
+         (THETOKEN     (CADR THESPLIT)))
+    (UNLESS (GETHASH THETOKEN *APPROVED*)
+      (FT "~A~%" VALUE!))))
+        
+
+
+
